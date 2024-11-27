@@ -1,20 +1,5 @@
 <script setup lang="ts">
-enum Gender {
-  GIRL = "Girl",
-  BOY = "Boy",
-  UNISEX = "Unisex",
-}
-
-enum Popularity {
-  TRENDY = "Trendy",
-  UNIQUE = "Unique",
-}
-
-enum Length {
-  LONG = "Long",
-  SHORT = "Short",
-  ALL = "All",
-}
+import { Gender, Popularity, Length, names } from "./data";
 interface OptionsState {
   gender: Gender;
   popularity: Popularity;
@@ -26,6 +11,20 @@ const options = reactive<OptionsState>({
   popularity: Popularity.UNIQUE,
   length: Length.SHORT,
 });
+
+const selectedNames = ref<string[]>([]);
+
+const computeSelectedNames = () => {
+  const filteredNames = names
+    .filter((name) => name.gender === options.gender)
+    .filter((name) => name.popularity === options.popularity)
+    .filter((name) => {
+      return options.length === Length.ALL
+        ? true
+        : name.length === options.length;
+    });
+  selectedNames.value = filteredNames.map((name) => name.name);
+};
 </script>
 
 <template>
@@ -108,6 +107,13 @@ const options = reactive<OptionsState>({
           </button>
         </div>
       </div>
+      <button class="primary" @click="computeSelectedNames">Find Names</button>
+    </div>
+    <div class="cards-container">
+      <div class="card" v-for="name in selectedNames" :key="name">
+        <p>{{ name }}</p>
+      </div>
+      </div>
     </div>
   </div>
 </template>
@@ -163,5 +169,16 @@ h1 {
 .option-active {
   background-color: rgb(249, 87, 89);
   color: white;
+}
+
+.primary {
+  background-color: rgb(249, 87, 89);
+  color: white;
+  border-radius: 6.5rem;
+  border: none;
+  padding: 0.75rem 4rem;
+  font-size: 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
 }
 </style>
